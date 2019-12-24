@@ -55,3 +55,14 @@ hugo new post/hugo-githubpages.md
  $ git remote add origin https://github.com/usuario/repositorio.git
  $ git push -u origin master
  ```
+### 7. Criando github pages
+
+Agora devemos criar um repositorio publico com o seguinte nome: "usuario.github.io"
+```
+$ git submodule add -b master https://github.com/usuario/usuario.github.io.git public
+$ hugo -D
+$ cd public/
+$ git add .
+$ git commit -m "Subindo o blog"
+$ git push origin master
+```

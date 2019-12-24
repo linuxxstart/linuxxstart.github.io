@@ -37,7 +37,7 @@
     
     "genre": "posts",
     
-    "wordcount":  202 ,
+    "wordcount":  253 ,
     "url": "https:\/\/linuxxstart.github.io\/2019\/12\/hugo-githubpages\/",
     
         "datePublished": "2019-12-24T16:57:50-02:00",
@@ -129,8 +129,8 @@
             </div>
             <div class="post-meta-other">
                 <i class="far fa-calendar-alt fa-fw"></i><time datetime=2019-12-24>2019-12-24</time>&nbsp;
-                <i class="fas fa-pencil-alt fa-fw"></i>about 202 words&nbsp;
-                <i class="far fa-clock fa-fw"></i>1 min&nbsp;</div>
+                <i class="fas fa-pencil-alt fa-fw"></i>about 253 words&nbsp;
+                <i class="far fa-clock fa-fw"></i>2 min&nbsp;</div>
         </div>
 
         
@@ -149,6 +149,7 @@
         <li><a href="#4-inciar-o-hugo">4. Inciar o Hugo</a></li>
         <li><a href="#5-criando-um-post">5. Criando um post</a></li>
         <li><a href="#6-salvando-as-mundanas">6. Salvando as mundanças</a></li>
+        <li><a href="#7-criando-github-pages">7. Criando github pages</a></li>
       </ul>
     </li>
   </ul>
@@ -172,6 +173,7 @@
         <li><a href="#4-inciar-o-hugo">4. Inciar o Hugo</a></li>
         <li><a href="#5-criando-um-post">5. Criando um post</a></li>
         <li><a href="#6-salvando-as-mundanas">6. Salvando as mundanças</a></li>
+        <li><a href="#7-criando-github-pages">7. Criando github pages</a></li>
       </ul>
     </li>
   </ul>
@@ -289,6 +291,26 @@ $ git clone https://github.com/dillonzq/LoveIt.git
  $ git commit -m &#34;Adicionar arquivos basicos do Hugo&#34;
  $ git remote add origin https://github.com/usuario/repositorio.git
  $ git push -u origin master
+</code></pre></td></tr></table>
+</div>
+</div><a class="post-dummy-target" id="7-criando-github-pages"></a><h3>7. Criando github pages</h3>
+<p>Agora devemos criar um repositorio publico com o seguinte nome: &ldquo;usuario.github.io&rdquo;</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ git submodule add -b master https://github.com/usuario/usuario.github.io.git public
+$ hugo -D
+$ cd public/
+$ git add .
+$ git commit -m &#34;Subindo o blog&#34;
+$ git push origin master
 </code></pre></td></tr></table>
 </div>
 </div>
