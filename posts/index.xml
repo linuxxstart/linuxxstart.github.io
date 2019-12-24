@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Everton Cordeiro</title>
+    <link>https://linuxxstart.github.io/posts/</link>
+    <description>Recent content in Posts on Everton Cordeiro</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>pt-br</language>
+    <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
+    <lastBuildDate>Tue, 24 Dec 2019 16:57:50 -0200</lastBuildDate>
+    
+	<atom:link href="https://linuxxstart.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Criando Github Pages com Hugo</title>
+      <link>https://linuxxstart.github.io/2019/12/hugo-githubpages/</link>
+      <pubDate>Tue, 24 Dec 2019 16:57:50 -0200</pubDate>
+      
+      <guid>https://linuxxstart.github.io/2019/12/hugo-githubpages/</guid>
+      <description>Configurando um site estático com hugo e github pages Estou reunindo as configurações que eu usei para montar este site, mas sempre é bom consultar a doc oficial.
+1. Instalando o Hugo. Foi usado o binário do pacote para linux, a versão usada foi a v0.62.0
+1 2 3  $ https://github.com/gohugoio/hugo/releases/download/v0.62.0/hugo_0.62.0_Linux-64bit.tar.gz $ tar zxvf hugo_0.62.0_Linux-64bit.tar.gz &amp;amp;&amp;amp; sudo mv hugo /usr/local/bin/ $ hugo version   2. Criar o site 1 2  $ hugo new site escolha_um_nome $ cd nome_escolhido &amp;amp;&amp;amp; git init .</description>
+    </item>
+    
+  </channel>
+</rss>
