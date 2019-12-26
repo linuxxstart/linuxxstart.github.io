@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>pt-br</language>
     <copyright>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.</copyright>
-    <lastBuildDate>Tue, 24 Dec 2019 16:57:50 -0200</lastBuildDate>
+    <lastBuildDate>Thu, 26 Dec 2019 10:06:45 -0300</lastBuildDate>
     
 	<atom:link href="https://linuxxstart.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Deploy de vms no vCenter e cluster swarm com ansible</title>
+      <link>https://linuxxstart.github.io/2019/12/ansible-vmware/</link>
+      <pubDate>Thu, 26 Dec 2019 10:06:45 -0300</pubDate>
+      
+      <guid>https://linuxxstart.github.io/2019/12/ansible-vmware/</guid>
+      <description>Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo Rafael Gomes a “botar a cara” e produzir para comunidade, lá vamos nós.
+Como primeiro post do blog, acredito que será um grande aprendizado, mas também espero que o mesmo possa ajudar com o pequeno conteúdo técnico que estou aprendendo.
+Vou fazer uma playbook do ansible para criação de máquinas virtuais no vcenter.</description>
+    </item>
     
     <item>
       <title>Criando Github Pages com Hugo</title>
