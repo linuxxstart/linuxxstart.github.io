@@ -2,7 +2,7 @@
 
 ![image](https://user-images.githubusercontent.com/55243431/71477680-0476e800-27ca-11ea-83eb-348437581d93.png)
 
-Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo Rafael Gomes a “botar a cara” e produzir para comunidade, lá vamos nós.
+Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo [Rafael Gomes](https://gomex.me/) a “botar a cara” e produzir para comunidade, lá vamos nós.
 
 Como primeiro post do blog, acredito que será um grande aprendizado, mas também espero que o mesmo possa ajudar com o pequeno conteúdo técnico que estou aprendendo.
 
@@ -235,7 +235,7 @@ https://github.com/linuxxstart/ansible-vmware-deploy
 
 Tirei grande parte da criação do cluster swarm do mundodocker, do post do -
 
-Cristhian Bicca , tive que adaptar algumas coisas referente ao vcenter, mas no final deu certo.
+[Cristhian Bicca](https://www.mundodocker.com.br/author/cristhian/) , tive que adaptar algumas coisas referente ao vcenter, mas no final deu certo.
 
 https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html
 
