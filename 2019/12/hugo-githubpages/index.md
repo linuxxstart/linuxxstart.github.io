@@ -60,7 +60,7 @@ hugo new post/hugo-githubpages.md
 Agora devemos criar um repositorio publico com o seguinte nome: "usuario.github.io"
 ```
 $ git submodule add -b master https://github.com/usuario/usuario.github.io.git public
-$ hugo -D
+$ HUGO_ENV=production hugo --gc --minify -D
 $ cd public/
 $ git add .
 $ git commit -m "Subindo o blog"
