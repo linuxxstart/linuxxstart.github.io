@@ -1,288 +1,38 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Deploy de vms no vCenter e cluster swarm com ansible | Everton Cordeiro</title><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noodp" />
-<meta name="Description" content="">
-<link rel="prev" href="https://linuxxstart.github.io/2019/12/hugo-githubpages/" />
-<link rel="canonical" href="https://linuxxstart.github.io/2019/12/ansible-vmware/" />
-<link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="manifest" href="/site.webmanifest">
-<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="theme-color" content="#ffffff">
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="Deploy de vms no vCenter e cluster swarm com ansible"/>
-<meta name="twitter:description" content="Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo Rafael Gomes a “botar a cara” e produzir para comunidade, lá vamos nós.
+<!doctype html><html lang=pt-br><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Deploy de vms no vCenter e cluster swarm com ansible | Everton Cordeiro</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta name=Description content><link rel=prev href=https://linuxxstart.github.io/2019/12/hugo-githubpages/><link rel=canonical href=https://linuxxstart.github.io/2019/12/ansible-vmware/><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><meta name=twitter:card content="summary"><meta name=twitter:title content="Deploy de vms no vCenter e cluster swarm com ansible"><meta name=twitter:description content="Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo Rafael Gomes a “botar a cara” e produzir para comunidade, lá vamos nós.
 Como primeiro post do blog, acredito que será um grande aprendizado, mas também espero que o mesmo possa ajudar com o pequeno conteúdo técnico que estou aprendendo.
-Vou fazer uma playbook do ansible para criação de máquinas virtuais no vcenter."/>
-<script type="application/ld+json">
-    {
-    "@context": "http://schema.org",
-    "@type": "BlogPosting",
-    "headline": "Deploy de vms no vCenter e cluster swarm com ansible",
-    "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https:\/\/linuxxstart.github.io\/2019\/12\/ansible-vmware\/"
-    },
-    
-        "image": {
-            "@type": "ImageObject",
-            "url": "https:\/\/linuxxstart.github.io\/cover.png",
-            "width":  800 ,
-            "height":  600 
-        },
-    
-    "genre": "posts",
-    
-    "wordcount":  1070 ,
-    "url": "https:\/\/linuxxstart.github.io\/2019\/12\/ansible-vmware\/",
-    
-        "datePublished": "2019-12-26T10:06:45-03:00",
-    
-    
-        "dateModified": "2019-12-26T10:06:45-03:00",
-    
-    
-        "license": "This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.",
-    
-    
-        "publisher": {
-            "@type": "Organization",
-            "name": "Everton Cordeiro",
-            "logo": {
-            "@type": "ImageObject",
-            "url": "https:\/\/linuxxstart.github.io\/logo.png",
-            "width":  127 ,
-            "height":  40 
-            }
-        },
-    
-    
-    "description": ""
-    }
-    </script>
-<link rel="stylesheet" href="/css/style.min.css">
-<link rel="stylesheet" href="/css/lib/fontawesome-free/all.min.min.css">
-
-<link rel="stylesheet" href="/css/lib/animate/animate.min.min.css">
-
-    </head>
-    <body>
-        <script>
-            window.isDark = (window.localStorage && window.localStorage.getItem('theme')) === 'dark';
-            window.isDark && document.body.classList.add('dark-theme');
-        </script>
-        <div class="wrapper">
-            <nav class="navbar">
-    <div class="navbar-container">
-        <div class="navbar-header animated bounceIn">
-            <a href="https://linuxxstart.github.io/">Everton Cordeiro</a>
-        </div>
-        <div class="navbar-menu">
-            
-            
-                <a class="menu-item" href="https://linuxxstart.github.io/posts" title="">Posts</a>
-            
-                <a class="menu-item" href="https://linuxxstart.github.io/about" title="">About</a>
-            
-            <a href="javascript:void(0);" class="theme-switch"><i class="fas fa-adjust fa-rotate-180 fa-fw"></i></a>
-        </div>
-    </div>
-</nav>
-<nav class="navbar-mobile">
-     <div class="navbar-container">
-        <div class="navbar-header">
-            <div class="navbar-header-title animated bounceIn">
-                <a href="https://linuxxstart.github.io/">Everton Cordeiro</a>
-            </div>
-            <div class="menu-toggle" id="menu-toggle">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-        <div class="navbar-menu" id="mobile-menu">
-            
-            
-                <a class="menu-item" href="https://linuxxstart.github.io/posts" title="">Posts</a>
-            
-                <a class="menu-item" href="https://linuxxstart.github.io/about" title="">About</a>
-            
-            <a href="javascript:void(0);" class="theme-switch"><i class="fas fa-adjust fa-rotate-180 fa-fw"></i></a>
-        </div>
-    </div>
-</nav><main class="main">
-                <div class="container">
-                    
-    
-    
-    
-
-    <article class="post-warp">
-        <h1 class="post-title animated flipInX">Deploy de vms no vCenter e cluster swarm com ansible</h1>
-
-        <div class="post-meta">
-            <div class="post-meta-main">
-                <a class="author" href="https://linuxxstart.github.io/" rel="author"><i class="fas fa-user-circle fa-fw"></i>&nbsp;</a>
-                
-            </div>
-            <div class="post-meta-other">
-                <i class="far fa-calendar-alt fa-fw"></i><time datetime=2019-12-26>2019-12-26</time>&nbsp;
-                <i class="fas fa-pencil-alt fa-fw"></i>about 1070 words&nbsp;
-                <i class="far fa-clock fa-fw"></i>6 min&nbsp;</div>
-        </div>
-
-        
-
-        <div class="post-toc" id="post-toc">
-                <h2 class="post-toc-title">Table of Contents</h2>
-                <div class="post-toc-content">
-                    <nav id="TableOfContents">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#requisitos-necessrio">Requisitos necessário</a></li>
-        <li><a href="#1-instalando-ansible">1. Instalando ansible</a></li>
-        <li><a href="#2-instale-o-mdulo-pyvmomi-para-conexo-api-do-vcenter">2. Instale o módulo PyVmomi para conexão API do vcenter</a></li>
-        <li><a href="#criando-playbook-roles-e-vars">Criando Playbook, roles e vars</a></li>
-        <li><a href="#1-criando-variveis">1. Criando variáveis</a></li>
-        <li><a href="#2-inventrio-de-vms">2. Inventário de vms</a></li>
-        <li><a href="#3-roles">3. Roles</a></li>
-        <li><a href="#4-criando-vms">4. Criando vms</a></li>
-        <li><a href="#5-habilitando-o-swarm">5. Habilitando o Swarm</a></li>
-        <li><a href="#6-habilitando-o-worker">6. Habilitando o worker</a></li>
-        <li><a href="#7-agora-vamos-criar-o-arquivo-que-vai-chamar-as-roles">7. Agora, vamos criar o arquivo que vai chamar as roles</a></li>
-        <li><a href="#8-executando-o-playbook">8. Executando o playbook</a></li>
-        <li><a href="#fontes">Fontes</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-                </div>
-            </div>
-            <div class="post-toc-mobile" id="post-toc-mobile">
-                <details>
-                    <summary><div class="post-toc-title"><span>Table of Contents</span><span><i class="details icon fas fa-angle-down"></i></span></div></summary>
-                    <div class="post-toc-content">
-                        
-                        
-                        <nav id="TableOfContentsMobile">
-  <ul>
-    <li>
-      <ul>
-        <li><a href="#requisitos-necessrio">Requisitos necessário</a></li>
-        <li><a href="#1-instalando-ansible">1. Instalando ansible</a></li>
-        <li><a href="#2-instale-o-mdulo-pyvmomi-para-conexo-api-do-vcenter">2. Instale o módulo PyVmomi para conexão API do vcenter</a></li>
-        <li><a href="#criando-playbook-roles-e-vars">Criando Playbook, roles e vars</a></li>
-        <li><a href="#1-criando-variveis">1. Criando variáveis</a></li>
-        <li><a href="#2-inventrio-de-vms">2. Inventário de vms</a></li>
-        <li><a href="#3-roles">3. Roles</a></li>
-        <li><a href="#4-criando-vms">4. Criando vms</a></li>
-        <li><a href="#5-habilitando-o-swarm">5. Habilitando o Swarm</a></li>
-        <li><a href="#6-habilitando-o-worker">6. Habilitando o worker</a></li>
-        <li><a href="#7-agora-vamos-criar-o-arquivo-que-vai-chamar-as-roles">7. Agora, vamos criar o arquivo que vai chamar as roles</a></li>
-        <li><a href="#8-executando-o-playbook">8. Executando o playbook</a></li>
-        <li><a href="#fontes">Fontes</a></li>
-      </ul>
-    </li>
-  </ul>
-</nav>
-                    </div>
-                </details>
-            </div>
-
-        <div class="post-content">
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            <p><img src="https://user-images.githubusercontent.com/55243431/71477680-0476e800-27ca-11ea-83eb-348437581d93.png" alt="image"></p>
-<p>Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo <a href="https://gomex.me/">Rafael Gomes</a> a “botar a cara” e produzir para comunidade, lá vamos nós.</p>
-<p>Como primeiro post do blog, acredito que será um grande aprendizado, mas também espero que o mesmo possa ajudar com o pequeno conteúdo técnico que estou aprendendo.</p>
-<p>Vou fazer uma playbook do ansible para criação de máquinas virtuais no vcenter. Além da criação das vms, adicionei a instalação do cluster swarm. Vejo que esse conteúdo do vcenter é pouco explorado atualmente, hoje vemos muitos conteúdos de ansible para clouds. Mas, assim como eu trabalho em um empresa que utiliza o vmware, acredito que tem outro colegas na mesma situação.</p>
-<a class="post-dummy-target" id="requisitos-necessrio"></a><h3>Requisitos necessário</h3>
-<a class="post-dummy-target" id="1-instalando-ansible"></a><h3>1. Instalando ansible</h3>
-<p>Primeiramente, vamos precisar ter o ansible instalado. Vou demostrar a instalação do ansible no Debian, para outros sistemas, recomendo que siga a documentação oficial.</p>
-<p>Adicione a linha abaixo no arquivo /etc/apt/sources.list:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main
-</code></pre></td></tr></table>
-</div>
-</div><p>Agora execute os comando:</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ sudo apt-key adv — keyserver keyserver.ubuntu.com — recv-keys 93C4A3FD7BB9C367
+Vou fazer uma playbook do ansible para criação de máquinas virtuais no vcenter."><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"Deploy de vms no vCenter e cluster swarm com ansible","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/linuxxstart.github.io\/2019\/12\/ansible-vmware\/"},"image":{"@type":"ImageObject","url":"https:\/\/linuxxstart.github.io\/cover.png","width":800,"height":600},"genre":"posts","wordcount":1070,"url":"https:\/\/linuxxstart.github.io\/2019\/12\/ansible-vmware\/","datePublished":"2019-12-26T10:06:45-03:00","dateModified":"2019-12-26T10:06:45-03:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"Everton Cordeiro","logo":{"@type":"ImageObject","url":"https:\/\/linuxxstart.github.io\/logo.png","width":127,"height":40}},"description":""}</script><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=/css/lib/fontawesome-free/all.min.min.css><link rel=stylesheet href=/css/lib/animate/animate.min.min.css></head><body><script>window.isDark=(window.localStorage&&window.localStorage.getItem('theme'))==='dark';window.isDark&&document.body.classList.add('dark-theme');</script><div class=wrapper><nav class=navbar><div class=navbar-container><div class="navbar-header animated bounceIn"><a href=https://linuxxstart.github.io/>Everton Cordeiro</a></div><div class=navbar-menu><a class=menu-item href=https://linuxxstart.github.io/posts>Posts</a>
+<a class=menu-item href=https://linuxxstart.github.io/about>About</a>
+<a href=javascript:void(0); class=theme-switch><i class="fas fa-adjust fa-rotate-180 fa-fw"></i></a></div></div></nav><nav class=navbar-mobile><div class=navbar-container><div class=navbar-header><div class="navbar-header-title animated bounceIn"><a href=https://linuxxstart.github.io/>Everton Cordeiro</a></div><div class=menu-toggle id=menu-toggle><span></span><span></span><span></span></div></div><div class=navbar-menu id=mobile-menu><a class=menu-item href=https://linuxxstart.github.io/posts>Posts</a>
+<a class=menu-item href=https://linuxxstart.github.io/about>About</a>
+<a href=javascript:void(0); class=theme-switch><i class="fas fa-adjust fa-rotate-180 fa-fw"></i></a></div></div></nav><main class=main><div class=container><article class=post-warp><h1 class="post-title animated flipInX">Deploy de vms no vCenter e cluster swarm com ansible</h1><div class=post-meta><div class=post-meta-main><a class=author href=https://linuxxstart.github.io/ rel=author><i class="fas fa-user-circle fa-fw"></i>&nbsp;</a></div><div class=post-meta-other><i class="far fa-calendar-alt fa-fw"></i><time datetime=2019-12-26>2019-12-26</time>&nbsp;
+<i class="fas fa-pencil-alt fa-fw"></i>about 1070 words&nbsp;
+<i class="far fa-clock fa-fw"></i>6 min&nbsp;</div></div><div class=post-toc id=post-toc><h2 class=post-toc-title>Table of Contents</h2><div class=post-toc-content><nav id=TableOfContents><ul><li><ul><li><a href=#requisitos-necessrio>Requisitos necessário</a></li><li><a href=#1-instalando-ansible>1. Instalando ansible</a></li><li><a href=#2-instale-o-mdulo-pyvmomi-para-conexo-api-do-vcenter>2. Instale o módulo PyVmomi para conexão API do vcenter</a></li><li><a href=#criando-playbook-roles-e-vars>Criando Playbook, roles e vars</a></li><li><a href=#1-criando-variveis>1. Criando variáveis</a></li><li><a href=#2-inventrio-de-vms>2. Inventário de vms</a></li><li><a href=#3-roles>3. Roles</a></li><li><a href=#4-criando-vms>4. Criando vms</a></li><li><a href=#5-habilitando-o-swarm>5. Habilitando o Swarm</a></li><li><a href=#6-habilitando-o-worker>6. Habilitando o worker</a></li><li><a href=#7-agora-vamos-criar-o-arquivo-que-vai-chamar-as-roles>7. Agora, vamos criar o arquivo que vai chamar as roles</a></li><li><a href=#8-executando-o-playbook>8. Executando o playbook</a></li><li><a href=#fontes>Fontes</a></li></ul></li></ul></nav></div></div><div class=post-toc-mobile id=post-toc-mobile><details><summary><div class=post-toc-title><span>Table of Contents</span><span><i class="details icon fas fa-angle-down"></i></span></div></summary><div class=post-toc-content><nav id=TableOfContentsMobile><ul><li><ul><li><a href=#requisitos-necessrio>Requisitos necessário</a></li><li><a href=#1-instalando-ansible>1. Instalando ansible</a></li><li><a href=#2-instale-o-mdulo-pyvmomi-para-conexo-api-do-vcenter>2. Instale o módulo PyVmomi para conexão API do vcenter</a></li><li><a href=#criando-playbook-roles-e-vars>Criando Playbook, roles e vars</a></li><li><a href=#1-criando-variveis>1. Criando variáveis</a></li><li><a href=#2-inventrio-de-vms>2. Inventário de vms</a></li><li><a href=#3-roles>3. Roles</a></li><li><a href=#4-criando-vms>4. Criando vms</a></li><li><a href=#5-habilitando-o-swarm>5. Habilitando o Swarm</a></li><li><a href=#6-habilitando-o-worker>6. Habilitando o worker</a></li><li><a href=#7-agora-vamos-criar-o-arquivo-que-vai-chamar-as-roles>7. Agora, vamos criar o arquivo que vai chamar as roles</a></li><li><a href=#8-executando-o-playbook>8. Executando o playbook</a></li><li><a href=#fontes>Fontes</a></li></ul></li></ul></nav></div></details></div><div class=post-content><p><img src=https://user-images.githubusercontent.com/55243431/71477680-0476e800-27ca-11ea-83eb-348437581d93.png alt=image></p><p>Fala pessoal, apesar de não gostar de escrever e muito menos me vi tendo um blog, mas depois de ser incentivado pelo <a href=https://gomex.me/>Rafael Gomes</a> a “botar a cara” e produzir para comunidade, lá vamos nós.</p><p>Como primeiro post do blog, acredito que será um grande aprendizado, mas também espero que o mesmo possa ajudar com o pequeno conteúdo técnico que estou aprendendo.</p><p>Vou fazer uma playbook do ansible para criação de máquinas virtuais no vcenter. Além da criação das vms, adicionei a instalação do cluster swarm. Vejo que esse conteúdo do vcenter é pouco explorado atualmente, hoje vemos muitos conteúdos de ansible para clouds. Mas, assim como eu trabalho em um empresa que utiliza o vmware, acredito que tem outro colegas na mesma situação.</p><a class=post-dummy-target id=requisitos-necessrio></a><h3>Requisitos necessário</h3><a class=post-dummy-target id=1-instalando-ansible></a><h3>1. Instalando ansible</h3><p>Primeiramente, vamos precisar ter o ansible instalado. Vou demostrar a instalação do ansible no Debian, para outros sistemas, recomendo que siga a documentação oficial.</p><p>Adicione a linha abaixo no arquivo /etc/apt/sources.list:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main
+</code></pre></td></tr></table></div></div><p>Agora execute os comando:</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ sudo apt-key adv — keyserver keyserver.ubuntu.com — recv-keys 93C4A3FD7BB9C367
 $ sudo apt update
 $ sudo apt install ansible
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="2-instale-o-mdulo-pyvmomi-para-conexo-api-do-vcenter"></a><h3>2. Instale o módulo PyVmomi para conexão API do vcenter</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">sudo apt install python-pip
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=2-instale-o-mdulo-pyvmomi-para-conexo-api-do-vcenter></a><h3>2. Instale o módulo PyVmomi para conexão API do vcenter</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>sudo apt install python-pip
 sudo pip install pyvmomi
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="criando-playbook-roles-e-vars"></a><h3>Criando Playbook, roles e vars</h3>
-<a class="post-dummy-target" id="1-criando-variveis"></a><h3>1. Criando variáveis</h3>
-<p>Estou criando um arquivo com as variáveis necessárias para acesso ao vcenter e do acesso ao vmware_tools da vms após as mesma serem criada.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ vim group_vars/all
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=criando-playbook-roles-e-vars></a><h3>Criando Playbook, roles e vars</h3><a class=post-dummy-target id=1-criando-variveis></a><h3>1. Criando variáveis</h3><p>Estou criando um arquivo com as variáveis necessárias para acesso ao vcenter e do acesso ao vmware_tools da vms após as mesma serem criada.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ vim group_vars/all
 
 ansible_connection: vmware_tools
 ansible_vmware_host: vcenter.teste.br
@@ -296,118 +46,94 @@ ansible_vmware_tools_user: root
 ansible_vmware_tools_password: senha
 docker_swarm_manager_ip: &#34;192.168.0.1&#34;
 docker_swarm_manager_port: &#34;2377&#34;
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="2-inventrio-de-vms"></a><h3>2. Inventário de vms</h3>
-<p>Vamos criar um arquivo onde estarão os grupos “manager” e “worker” do docker. Também terá os nomes e ips que serão configurados nas vms assim que elas forem criadas e o datastore que onde serão alocadas.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ vim vms_deploy[docker_swarm_manager]
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=2-inventrio-de-vms></a><h3>2. Inventário de vms</h3><p>Vamos criar um arquivo onde estarão os grupos “manager” e “worker” do docker. Também terá os nomes e ips que serão configurados nas vms assim que elas forem criadas e o datastore que onde serão alocadas.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ vim vms_deploy[docker_swarm_manager]
 ansible-ubuntu01 guest_custom_ip=’192.168.0.1&#39; vsphere_datastore=’datastore01’
 ansible-ubuntu02 guest_custom_ip=’192.168.0.2&#39; vsphere_datastore=’datastore01’
 [docker_swarm_worker]
 ansible-ubuntu03 guest_custom_ip=’192.168.0.3&#39; vsphere_datastore=’datastore01’
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="3-roles"></a><h3>3. Roles</h3>
-<p>Vamos criar as pastas roles para separar cada ação que vamos fazer</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ mkdir -p roles/vms/tasks
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=3-roles></a><h3>3. Roles</h3><p>Vamos criar as pastas roles para separar cada ação que vamos fazer</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ mkdir -p roles/vms/tasks
 $ mkdir -p roles/manager/tasks
 $ mkdir -p roles/worker/tasks
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="4-criando-vms"></a><h3>4. Criando vms</h3>
-<p>Aqui vamos criar as vms no vcenter, trocar o hostname e instalar o docker.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span><span class="lnt">71
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ vim roles/vms/tasks/main.yml
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=4-criando-vms></a><h3>4. Criando vms</h3><p>Aqui vamos criar as vms no vcenter, trocar o hostname e instalar o docker.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span><span class=lnt>69
+</span><span class=lnt>70
+</span><span class=lnt>71
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ vim roles/vms/tasks/main.yml
 
 - name: &#34;Criando vms&#34;
     vmware_guest:
@@ -478,38 +204,30 @@ $ mkdir -p roles/worker/tasks
       vm_shell_args: &#34;-fsSL https://get.docker.com | sh &gt; /tmp/$$.txt 2&gt;&amp;1&#34;
       wait_for_process: True
     delegate_to: localhost
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="5-habilitando-o-swarm"></a><h3>5. Habilitando o Swarm</h3>
-<p>Aqui nós vamos configurar o swarm no primeiro hosts e depois habilitá-lo nos demais hosts do grupo manager</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ vim roles/manager/tasks/main.yml
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=5-habilitando-o-swarm></a><h3>5. Habilitando o Swarm</h3><p>Aqui nós vamos configurar o swarm no primeiro hosts e depois habilitá-lo nos demais hosts do grupo manager</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ vim roles/manager/tasks/main.yml
 
 - hosts: all
   gather_facts: False
@@ -532,31 +250,23 @@ $ mkdir -p roles/worker/tasks
     and docker_info.stdout.find(&#39;Swarm: pending&#39;) == -1
     and &#39;docker_swarm_manager&#39; in group_names
     and inventory_hostname != groups[&#39;docker_swarm_manager&#39;][0]&#34;
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="6-habilitando-o-worker"></a><h3>6. Habilitando o worker</h3>
-<p>Agora vamos incluir os hosts do grupo worker no swarm.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ vim roles/worker/tasks/main.yml
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=6-habilitando-o-worker></a><h3>6. Habilitando o worker</h3><p>Agora vamos incluir os hosts do grupo worker no swarm.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ vim roles/worker/tasks/main.yml
  
 - name: Verifica se o Docker Swarm está habilitado.
     shell: docker info
@@ -572,27 +282,20 @@ $ mkdir -p roles/worker/tasks
     changed_when: False
     when: &#34;docker_info.stdout.find(&#39;Swarm: active&#39;) == -1
            and docker_info.stdout.find(&#39;Swarm: pending&#39;) == -1&#34;
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="7-agora-vamos-criar-o-arquivo-que-vai-chamar-as-roles"></a><h3>7. Agora, vamos criar o arquivo que vai chamar as roles</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ vim main.yml- name: Cirando vms
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=7-agora-vamos-criar-o-arquivo-que-vai-chamar-as-roles></a><h3>7. Agora, vamos criar o arquivo que vai chamar as roles</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ vim main.yml- name: Cirando vms
 
     hosts: all
     gather_facts: no
@@ -605,236 +308,9 @@ $ mkdir -p roles/worker/tasks
     hosts: docker_swarm_manager:docker_swarm_worker
     roles:
       - worker
-</code></pre></td></tr></table>
-</div>
-</div><a class="post-dummy-target" id="8-executando-o-playbook"></a><h3>8. Executando o playbook</h3>
-<p>Antes de executar o playbook, vamos criptografar nosso arquivo com usuário e senha do vcenter. Digite a senha que será necessária na execução do playbook.</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ ansible-vault encrypt group_vars/vmware-vars
-</code></pre></td></tr></table>
-</div>
-</div><p>Agora podemos rodar o nosso playbook</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">$ ansible-playbook -i vms_deploy main.yml --ask-vault-pass -K
-</code></pre></td></tr></table>
-</div>
-</div><p><img src="https://user-images.githubusercontent.com/55243431/71477958-d5617600-27cb-11ea-8a19-22eea75414f9.gif" alt="1*M3vcPPfyoeaSmx3xgU-jlw"></p>
-<p><a href="https://github.com/linuxxstart/ansible-vmware-deploy">https://github.com/linuxxstart/ansible-vmware-deploy</a></p>
-<a class="post-dummy-target" id="fontes"></a><h3>Fontes</h3>
-<p>Tirei grande parte da criação do cluster swarm do mundodocker, do post do -</p>
-<p><a href="https://www.mundodocker.com.br/author/cristhian/">Cristhian Bicca</a> , tive que adaptar algumas coisas referente ao vcenter, mas no final deu certo.</p>
-<p><a href="https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html">https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html</a></p>
-<p><a href="https://docs.ansible.com/ansible/latest/modules/vmware_vm_shell_module.html">https://docs.ansible.com/ansible/latest/modules/vmware_vm_shell_module.html</a></p>
-<p><a href="https://docs.ansible.com/ansible/latest/plugins/connection/vmware_tools.html">https://docs.ansible.com/ansible/latest/plugins/connection/vmware_tools.html</a></p>
-<p><a href="https://www.mundodocker.com.br/cluster-de-docker-swarm-com-ansible/">https://www.mundodocker.com.br/cluster-de-docker-swarm-com-ansible/</a>
-)</p>
-
-        </div>
-
-        <div class="post-footer" id="post-footer">
-    <div class="post-info">
-        <div class="post-info-line">
-            <div class="post-info-mod">
-                <span>This article is updated with 2019-12-26</span>
-            </div>
-            <div class="post-info-license">
-                
-            </div>
-        </div>
-        <div class="post-info-line">
-            <div class="post-info-md">
-                
-                    
-                        <span><a class="link-to-markdown" href="https://linuxxstart.github.io/2019/12/ansible-vmware/index.md" target="_blank"></a></span>
-                    
-                
-            </div>
-            <div class="post-info-share">
-                
-                    <span>
-    
-        <a href="//twitter.com/share?url=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fansible-vmware%2f&amp;text=Deploy%20de%20vms%20no%20vCenter%20e%20cluster%20swarm%20com%20ansible&amp;via=" target="_blank" title="Share on Twitter">
-            <i class="fab fa-twitter fa-fw"></i>
-        </a>
-    
-    
-        <a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fansible-vmware%2f" target="_blank" title="Share on Facebook">
-            <i class="fab fa-facebook-square fa-fw"></i>
-        </a>
-    
-    
-    
-        <a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fansible-vmware%2f&amp;title=Deploy%20de%20vms%20no%20vCenter%20e%20cluster%20swarm%20com%20ansible" target="_blank" title="Share on LinkedIn">
-            <i class="fab fa-linkedin fa-fw"></i>
-        </a>
-    
-    
-    
-    
-    
-    
-    
-</span>
-                
-            </div>
-        </div>
-    </div>
-
-    <div class="post-info-more">
-        <section>
-            
-        </section>
-        <section>
-            <span><a href="javascript:window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="https://linuxxstart.github.io/">Home</a></span>
-        </section>
-    </div>
-
-    <div class="post-nav">
-        
-            <a href="https://linuxxstart.github.io/2019/12/hugo-githubpages/" class="prev" rel="prev" title="Criando Github Pages com Hugo"><i class="fas fa-angle-left fa-fw"></i>Criando Github Pages com Hugo</a>
-        
-        
-    </div>
-</div>
-
-        <div class="post-comment">
-            
-            
-
-            
-        </div>
-    </article></div>
-            </main>
-            <footer class="footer">
-    <div class="copyright">
-        <div class="copyright-line">
-            Powered by <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreffer">Hugo</a>&nbsp;|&nbsp;Theme - <a href="https://github.com/dillonzq/LoveIt" target="_blank" rel="external nofollow noopener noreffer">LoveIt<i class="far fa-heart fa-fw"></i></a>
-        </div>
-        <div class="copyright-line">
-            <i class="far fa-copyright fa-fw"></i><span itemprop="copyrightYear">2018 - 2019</span><span class="license">&nbsp;|&nbsp;<a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
-    </div>
-</footer>
-
-
-    
-    
-
-
-
-
-    
-    
-
-
-
-
-    
-    
-
-
-
-
-
-    
-    
-
-
-
-    
-    
-
-
-
-    
-    
-
-
-
-
-
-    
-    
-
-
-
-
-
-    
-    
-
-
-
-    
-    
-
-
-
-
-
-    
-    
-
-
-
-
-    
-    
-
-
-
-
-    
-    
-
-
-
-    
-    
-
-
-
-
-
-    
-    
-
-
-<script src="/js/lib/jquery/jquery.slim.min.min.js"></script>
-<script src="/js/lib/lazysizes/lazysizes.min.min.js"></script>
-<script src="/js/lib/smooth-scroll/smooth-scroll.polyfills.min.min.js"></script><script>window.scroll = new SmoothScroll('[data-scroll]', {speed: 300, speedAsDuration: true});</script>
-
-
-    
-    
-
-    
-
-    
-        <link rel="stylesheet" href="/css/lib/katex/katex.min.min.css"><script src="/js/lib/katex/katex.min.min.js"></script><script defer src="/js/lib/katex/auto-render.min.min.js" onload="renderMathInElement(document.body);"></script>
-    
-
-    
-
-    
-
-
-
-
-
-
-<script src="/js/blog.min.js"></script>
-
-
-    
-</div>
-        <a href="#" class="dynamic-to-top" id="dynamic-to-top" data-scroll><span>&nbsp;</span></a>
-    </body>
-</html>
+</code></pre></td></tr></table></div></div><a class=post-dummy-target id=8-executando-o-playbook></a><h3>8. Executando o playbook</h3><p>Antes de executar o playbook, vamos criptografar nosso arquivo com usuário e senha do vcenter. Digite a senha que será necessária na execução do playbook.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ ansible-vault encrypt group_vars/vmware-vars
+</code></pre></td></tr></table></div></div><p>Agora podemos rodar o nosso playbook</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>$ ansible-playbook -i vms_deploy main.yml --ask-vault-pass -K
+</code></pre></td></tr></table></div></div><p><img src=https://user-images.githubusercontent.com/55243431/71477958-d5617600-27cb-11ea-8a19-22eea75414f9.gif alt=1*M3vcPPfyoeaSmx3xgU-jlw></p><p><a href=https://github.com/linuxxstart/ansible-vmware-deploy>https://github.com/linuxxstart/ansible-vmware-deploy</a></p><a class=post-dummy-target id=fontes></a><h3>Fontes</h3><p>Tirei grande parte da criação do cluster swarm do mundodocker, do post do -</p><p><a href=https://www.mundodocker.com.br/author/cristhian/>Cristhian Bicca</a> , tive que adaptar algumas coisas referente ao vcenter, mas no final deu certo.</p><p><a href=https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html>https://docs.ansible.com/ansible/latest/modules/vmware_guest_module.html</a></p><p><a href=https://docs.ansible.com/ansible/latest/modules/vmware_vm_shell_module.html>https://docs.ansible.com/ansible/latest/modules/vmware_vm_shell_module.html</a></p><p><a href=https://docs.ansible.com/ansible/latest/plugins/connection/vmware_tools.html>https://docs.ansible.com/ansible/latest/plugins/connection/vmware_tools.html</a></p><p><a href=https://www.mundodocker.com.br/cluster-de-docker-swarm-com-ansible/>https://www.mundodocker.com.br/cluster-de-docker-swarm-com-ansible/</a>
+)</p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>This article is updated with 2019-12-26</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=https://linuxxstart.github.io/2019/12/ansible-vmware/index.md target=_blank></a></span></div><div class=post-info-share><span><a href="//twitter.com/share?url=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fansible-vmware%2f&text=Deploy%20de%20vms%20no%20vCenter%20e%20cluster%20swarm%20com%20ansible&via=" target=_blank title="Share on Twitter"><i class="fab fa-twitter fa-fw"></i></a><a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fansible-vmware%2f" target=_blank title="Share on Facebook"><i class="fab fa-facebook-square fa-fw"></i></a><a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fansible-vmware%2f&title=Deploy%20de%20vms%20no%20vCenter%20e%20cluster%20swarm%20com%20ansible" target=_blank title="Share on LinkedIn"><i class="fab fa-linkedin fa-fw"></i></a></span></div></div></div><div class=post-info-more><section></section><section><span><a href=javascript:window.history.back();>Back</a></span>&nbsp;|&nbsp;<span><a href=https://linuxxstart.github.io/>Home</a></span></section></div><div class=post-nav><a href=https://linuxxstart.github.io/2019/12/hugo-githubpages/ class=prev rel=prev title="Criando Github Pages com Hugo"><i class="fas fa-angle-left fa-fw"></i>Criando Github Pages com Hugo</a></div></div><div class=post-comment><div id=disqus_thread></div><script type=text/javascript>(function(){var dsq=document.createElement("script");dsq.type="text/javascript";dsq.async=true;var disqus_shortname="linuxsstart";dsq.src="//"+disqus_shortname+".disqus.com/embed.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(dsq);})();</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com/ class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div></article></div></main><footer class=footer><div class=copyright><div class=copyright-line>Powered by <a href=https://gohugo.io/ target=_blank rel="external nofollow noopener noreffer">Hugo</a>&nbsp;|&nbsp;Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="external nofollow noopener noreffer">LoveIt<i class="far fa-heart fa-fw"></i></a></div><div class=copyright-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2018 - 2019</span><span class=license>&nbsp;|&nbsp;<a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer><script src=/js/lib/jquery/jquery.slim.min.min.js></script><script src=/js/lib/lazysizes/lazysizes.min.min.js></script><script src=/js/lib/smooth-scroll/smooth-scroll.polyfills.min.min.js></script><script>window.scroll=new SmoothScroll('[data-scroll]',{speed:300,speedAsDuration:true});</script><link rel=stylesheet href=/css/lib/katex/katex.min.min.css><script src=/js/lib/katex/katex.min.min.js></script><script defer src=/js/lib/katex/auto-render.min.min.js onload=renderMathInElement(document.body);></script><script src=/js/blog.min.js></script></div><a href=# class=dynamic-to-top id=dynamic-to-top data-scroll><span>&nbsp;</span></a></body></html>
