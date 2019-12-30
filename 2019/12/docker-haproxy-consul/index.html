@@ -1,0 +1,151 @@
+<!doctype html><html lang=pt-br><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>HAproxy + Consul com Docker Swarm | Everton Cordeiro</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=robots content="noodp"><meta name=Description content><link rel=prev href=https://linuxxstart.github.io/2019/12/ansible-vmware/><link rel=canonical href=https://linuxxstart.github.io/2019/12/docker-haproxy-consul/><link rel="shortcut icon" type=image/x-icon href=/favicon.ico><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/site.webmanifest><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><meta name=msapplication-TileColor content="#da532c"><meta name=theme-color content="#ffffff"><meta name=twitter:card content="summary"><meta name=twitter:title content="HAproxy + Consul com Docker Swarm"><meta name=twitter:description content="Fala pessoal,
+Hoje vou falar de um pequeno projeto que fiz para transferir uma aplicação que estava em vms para container.
+Utilizamos o HAproxy como balanceador de carga para essas aplicações e para manter a compatibilidade com a arquitetura já em funcionamento eu busquei uma forma de integrar o balanceador com a solução de micros serviços do docker. Apartir da versão 1.8 do HAproxy (Estamos utilizando a 1.9) houve um integração com o serviço consul."><script type=application/ld+json>{"@context":"http://schema.org","@type":"BlogPosting","headline":"HAproxy \x2b Consul com Docker Swarm","mainEntityOfPage":{"@type":"WebPage","@id":"https:\/\/linuxxstart.github.io\/2019\/12\/docker-haproxy-consul\/"},"image":{"@type":"ImageObject","url":"https:\/\/linuxxstart.github.io\/cover.png","width":800,"height":600},"genre":"posts","wordcount":694,"url":"https:\/\/linuxxstart.github.io\/2019\/12\/docker-haproxy-consul\/","datePublished":"2019-12-29T20:16:32-02:00","dateModified":"2019-12-29T20:16:32-02:00","license":"This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.","publisher":{"@type":"Organization","name":"Everton Cordeiro","logo":{"@type":"ImageObject","url":"https:\/\/linuxxstart.github.io\/logo.png","width":127,"height":40}},"description":""}</script><link rel=stylesheet href=/css/style.min.css><link rel=stylesheet href=/css/lib/fontawesome-free/all.min.min.css><link rel=stylesheet href=/css/lib/animate/animate.min.min.css></head><body><script>window.isDark=(window.localStorage&&window.localStorage.getItem('theme'))==='dark';window.isDark&&document.body.classList.add('dark-theme');</script><div class=wrapper><nav class=navbar><div class=navbar-container><div class="navbar-header animated bounceIn"><a href=https://linuxxstart.github.io/>Everton Cordeiro</a></div><div class=navbar-menu><a class=menu-item href=https://linuxxstart.github.io/posts>Posts</a>
+<a class=menu-item href=https://linuxxstart.github.io/about>About</a>
+<a href=javascript:void(0); class=theme-switch><i class="fas fa-adjust fa-rotate-180 fa-fw"></i></a></div></div></nav><nav class=navbar-mobile><div class=navbar-container><div class=navbar-header><div class="navbar-header-title animated bounceIn"><a href=https://linuxxstart.github.io/>Everton Cordeiro</a></div><div class=menu-toggle id=menu-toggle><span></span><span></span><span></span></div></div><div class=navbar-menu id=mobile-menu><a class=menu-item href=https://linuxxstart.github.io/posts>Posts</a>
+<a class=menu-item href=https://linuxxstart.github.io/about>About</a>
+<a href=javascript:void(0); class=theme-switch><i class="fas fa-adjust fa-rotate-180 fa-fw"></i></a></div></div></nav><main class=main><div class=container><article class=post-warp><h1 class="post-title animated flipInX">HAproxy + Consul com Docker Swarm</h1><div class=post-meta><div class=post-meta-main><a class=author href=https://linuxxstart.github.io/ rel=author><i class="fas fa-user-circle fa-fw"></i>&nbsp;</a></div><div class=post-meta-other><i class="far fa-calendar-alt fa-fw"></i><time datetime=2019-12-29>2019-12-29</time>&nbsp;
+<i class="fas fa-pencil-alt fa-fw"></i>about 694 words&nbsp;
+<i class="far fa-clock fa-fw"></i>4 min&nbsp;</div></div><div class=post-toc id=post-toc><h2 class=post-toc-title>Table of Contents</h2><div class=post-toc-content><nav id=TableOfContents><ul><li><ul><li><a href=#1-configuraes-haproxy>1. Configurações HAproxy</a></li><li><a href=#11-frontend-http>1.1. frontend http</a></li><li><a href=#12-frontend-https>1.2. frontend https</a></li><li><a href=#13-consul>1.3. consul</a></li><li><a href=#14-backend>1.4. backend</a></li><li><a href=#15-backend-manuteno>1.5. backend manutenção</a></li><li><a href=#2-subindo-a-stack>2. Subindo a stack</a></li></ul></li></ul></nav></div></div><div class=post-toc-mobile id=post-toc-mobile><details><summary><div class=post-toc-title><span>Table of Contents</span><span><i class="details icon fas fa-angle-down"></i></span></div></summary><div class=post-toc-content><nav id=TableOfContentsMobile><ul><li><ul><li><a href=#1-configuraes-haproxy>1. Configurações HAproxy</a></li><li><a href=#11-frontend-http>1.1. frontend http</a></li><li><a href=#12-frontend-https>1.2. frontend https</a></li><li><a href=#13-consul>1.3. consul</a></li><li><a href=#14-backend>1.4. backend</a></li><li><a href=#15-backend-manuteno>1.5. backend manutenção</a></li><li><a href=#2-subindo-a-stack>2. Subindo a stack</a></li></ul></li></ul></nav></div></details></div><div class=post-content><p>Fala pessoal,</p><p>Hoje vou falar de um pequeno projeto que fiz para transferir uma aplicação que estava em vms para container.</p><p>Utilizamos o HAproxy como balanceador de carga para essas aplicações e para manter a compatibilidade com a arquitetura já em funcionamento eu busquei uma forma de integrar o balanceador com a solução de micros serviços do docker. Apartir da versão 1.8 do HAproxy (Estamos utilizando a 1.9) houve um integração com o serviço consul.</p><p>O <a href=https://www.consul.io/>consul</a> é uma ferramenta de descoberta de micros serviços, entre outras funções. Ele será usado nesta solução como DNS, ele fornecerá os ips e portas dos serviços que criaremos no docker para o HAproxy.
+<img src=https://user-images.githubusercontent.com/55243431/71564806-631bba80-2a85-11ea-9e57-403aa0878ce5.png alt=imagem></p><p><a href=https://github.com/linuxxstart/docker-haproxy-consul>Arquivos do projeto</a></p><a class=post-dummy-target id=1-configuraes-haproxy></a><h3>1. Configurações HAproxy</h3><p><img src=https://user-images.githubusercontent.com/55243431/71564940-8c3d4a80-2a87-11ea-8c65-f042de4d7a3b.png alt=haproxy-arquivos></p><p>A imagem acima nos mostrar os arquivos que utilizei. Criei duas aplições (ou sites) para os nossos micros serviços: meusite.com.br e web.local.br. Por isso criei os arquivos de certificados, uma página de manutenção e o arquivo de configuração.</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span><span class=lnt>60
+</span><span class=lnt>61
+</span><span class=lnt>62
+</span><span class=lnt>63
+</span><span class=lnt>64
+</span><span class=lnt>65
+</span><span class=lnt>66
+</span><span class=lnt>67
+</span><span class=lnt>68
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>frontend http
+    bind *:80
+	##----------Linha para redirecionar www para nome do host-------##
+    http-request redirect prefix http://%[hdr(host),regsub(^www\.,,i)] code 301 if { hdr_beg(host) -i www. }
+    ##--------------------------------------------------------------##
+	http-request redirect scheme https if !{ ssl_fc }
+
+frontend https
+    bind *:443 ssl crt /usr/local/etc/haproxy/ssl/
+    
+
+	## -----------ACLs dominios dos sistemas-----------##
+    acl meusite hdr_end(host) -i meusite.com.br
+    acl web hdr_end(host) -i web.local.br
+    ##-------------------------------------------------##	
+
+	##-------------Pagina de manutencao----------------##
+    acl all_ips src 0.0.0.0/0
+    #acl rede_local src 192.168.0.0/24
+	#use_backend manutencao if all_ips meusite !rede_local 
+    ##-------------------------------------------------##
+
+	##------------ACLs de redirecionamento-------------##
+	acl raiz path -i /
+	##-------------------------------------------------##
+
+
+	##--------Redirecionamento de URLs-----------------##
+    http-request redirect code 301 location https://meusite.com.br/teste1 if meusite raiz
+    http-request redirect code 301 location https://web.local.br/site if web raiz
+    ##-------------------------------------------------##
+
+	##-------Redireciona o dominio para o sistema------##
+    use_backend meusite if meusite
+    use_backend web if web
+    ##-------------------------------------------------##
+
+resolvers consul
+  nameserver consul consul:8600
+  accepted_payload_size 8192
+  hold valid 5s
+
+
+backend meusite
+    
+	option httpchk GET /teste1/check.html
+    http-check expect status 200
+	acl meusite path_beg,url_dec -m beg -i /teste1 /test2 /teste3
+    http-request deny if !meusite
+    dynamic-cookie-key MYKEY
+    cookie SRVID insert dynamic
+    balance roundrobin
+    server-template meusite 4 _meusite._tcp.service.consul resolvers consul resolve-opts allow-dup-ip resolve-prefer ipv4 check
+
+backend web
+    
+	option httpchk GET /site/index.html
+    http-check expect status 200
+	acl meusite path_beg,url_dec -m beg -i /site
+    http-request deny if !meusite
+    dynamic-cookie-key MYKEY
+    cookie SRVID insert dynamic
+    balance roundrobin
+    server-template web 4 _web._tcp.service.consul resolvers consul resolve-opts allow-dup-ip resolve-prefer ipv4 check
+
+backend manutencao
+	mode http
+	errorfile  503 /usr/local/etc/haproxy/errors/manutencao.html
+</code></pre></td></tr></table></div></div><p>Coloquei algumas configurações acima que queria destacar.</p><a class=post-dummy-target id=11-frontend-http></a><h3>1.1. frontend http</h3><ul><li>redireciono o acesso www para o nome do host.</li><li>regra para redirecionar todo acesso http para https (frontend https).</li></ul><a class=post-dummy-target id=12-frontend-https></a><h3>1.2. frontend https</h3><p>Onde estão as configurações do serviços ou sites que iremos usar.</p><ul><li>definir uma pasta para os certificados dos múltiplos domínios.</li><li>acl com domínios das aplicações.</li><li>acl para uma página de manutenção das aplicações.</li><li>acl com o path raiz (/) do site.</li><li>acl redirecionar urls, onde defino uma urls para caso for do domínio “a” no path raiz.</li><li>acl que redireciona para o backend da aplicação.</li></ul><a class=post-dummy-target id=13-consul></a><h3>1.3. consul</h3><ul><li>definindo o servidor consul como dns de consulta para as aplicações.</li></ul><a class=post-dummy-target id=14-backend></a><h3>1.4. backend</h3><ul><li>definir uma página de checagem para verificar se a aplicação está no ar.</li><li>acl para negar o acesso aos subdiretórios que não existem na aplicação.</li><li>acl para persistência de sessão dinâmica.</li><li>acl para o tipo de balanceamento de carga.</li><li>onde definimos o nome da aplicação, o número instâncias ou replicas de container , a entrada dela no consul e a opção de checagem.</li></ul><a class=post-dummy-target id=15-backend-manuteno></a><h3>1.5. backend manutenção</h3><ul><li>em caso de erro 503 a página de manutenção será exibida.</li></ul><a class=post-dummy-target id=2-subindo-a-stack></a><h3>2. Subindo a stack</h3><p>Criar uma rede no swarm e depois subir a stack</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-fallback data-lang=fallback>docker network create --driver overlay --attachable rede_proxy
+docker stack deploy -c docker-compose.yml nome_da_stack
+</code></pre></td></tr></table></div></div><ul><li>os serviços mapeados pelo consul.</li></ul><p><img src=https://user-images.githubusercontent.com/55243431/71587958-8171cc80-2afe-11ea-8d0b-461747dcdf76.png alt=consul_01></p><p><img src=https://user-images.githubusercontent.com/55243431/71587976-90587f00-2afe-11ea-8b08-23672e648bfd.png alt=consul_02></p><ul><li>a página de status do HAproxy com os containers mapeados pelo consul up e a quantidades possíveis que definimos do arquivo de conf.</li></ul><p><img src=https://user-images.githubusercontent.com/55243431/71588017-b5e58880-2afe-11ea-91e0-b4b14ca274fa.png alt=haproy_01></p><ul><li>e aqui temos nossas aplicações sendo acessadas.</li></ul><p><img src=https://user-images.githubusercontent.com/55243431/71588045-cdbd0c80-2afe-11ea-8cb5-b8dfb66adfe5.png alt=web_01></p><p><img src=https://user-images.githubusercontent.com/55243431/71588058-da416500-2afe-11ea-9581-f8110dc3e5c6.png alt=meusite_01></p></div><div class=post-footer id=post-footer><div class=post-info><div class=post-info-line><div class=post-info-mod><span>This article is updated with 2019-12-29</span></div><div class=post-info-license></div></div><div class=post-info-line><div class=post-info-md><span><a class=link-to-markdown href=https://linuxxstart.github.io/2019/12/docker-haproxy-consul/index.md target=_blank></a></span></div><div class=post-info-share><span><a href="//twitter.com/share?url=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fdocker-haproxy-consul%2f&text=HAproxy%20%2b%20Consul%20com%20Docker%20Swarm&via=" target=_blank title="Share on Twitter"><i class="fab fa-twitter fa-fw"></i></a><a href="//www.facebook.com/sharer/sharer.php?u=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fdocker-haproxy-consul%2f" target=_blank title="Share on Facebook"><i class="fab fa-facebook-square fa-fw"></i></a><a href="//www.linkedin.com/shareArticle?url=https%3a%2f%2flinuxxstart.github.io%2f2019%2f12%2fdocker-haproxy-consul%2f&title=HAproxy%20%2b%20Consul%20com%20Docker%20Swarm" target=_blank title="Share on LinkedIn"><i class="fab fa-linkedin fa-fw"></i></a></span></div></div></div><div class=post-info-more><section></section><section><span><a href=javascript:window.history.back();>Back</a></span>&nbsp;|&nbsp;<span><a href=https://linuxxstart.github.io/>Home</a></span></section></div><div class=post-nav><a href=https://linuxxstart.github.io/2019/12/ansible-vmware/ class=prev rel=prev title="Deploy de vms no vCenter e cluster swarm com ansible"><i class="fas fa-angle-left fa-fw"></i>Deploy de vms no vCenter e cluster swarm com ansible</a></div></div><div class=post-comment><div id=disqus_thread></div><script type=text/javascript>(function(){if(window.location.hostname=="localhost")
+return;var dsq=document.createElement("script");dsq.type="text/javascript";dsq.async=true;var disqus_shortname="linuxxstart";dsq.src="//"+disqus_shortname+".disqus.com/embed.js";(document.getElementsByTagName("head")[0]||document.getElementsByTagName("body")[0]).appendChild(dsq);})();</script><noscript>Please enable JavaScript to view the <a href=https://disqus.com/?ref_noscript>comments powered by Disqus.</a></noscript><a href=https://disqus.com/ class=dsq-brlink>comments powered by <span class=logo-disqus>Disqus</span></a></div></article></div></main><footer class=footer><div class=copyright><div class=copyright-line>Powered by <a href=https://gohugo.io/ target=_blank rel="external nofollow noopener noreffer">Hugo</a>&nbsp;|&nbsp;Theme - <a href=https://github.com/dillonzq/LoveIt target=_blank rel="external nofollow noopener noreffer">LoveIt<i class="far fa-heart fa-fw"></i></a></div><div class=copyright-line><i class="far fa-copyright fa-fw"></i><span itemprop=copyrightYear>2018 - 2019</span><span class=license>&nbsp;|&nbsp;<a rel="license external nofollow noopener noreffer" href=https://creativecommons.org/licenses/by-nc/4.0/ target=_blank>CC BY-NC 4.0</a></span></div></div></footer><script src=/js/lib/jquery/jquery.slim.min.min.js></script><script src=/js/lib/lazysizes/lazysizes.min.min.js></script><script src=/js/lib/smooth-scroll/smooth-scroll.polyfills.min.min.js></script><script>window.scroll=new SmoothScroll('[data-scroll]',{speed:300,speedAsDuration:true});</script><link rel=stylesheet href=/css/lib/katex/katex.min.min.css><script src=/js/lib/katex/katex.min.min.js></script><script defer src=/js/lib/katex/auto-render.min.min.js onload=renderMathInElement(document.body);></script><script src=/js/blog.min.js></script></div><a href=# class=dynamic-to-top id=dynamic-to-top data-scroll><span>&nbsp;</span></a></body></html>
