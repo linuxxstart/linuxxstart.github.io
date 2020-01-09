@@ -45,7 +45,14 @@ Definindo as configuração do arquivo elasticsearch.yml.
 
 As configurações do sevice data node são parecidas, mudando apenas as nomeclaturos do service e do certificado.
 
-### 3.2. Redes e Volumes
+### 3.2. Kibana e Logstash
+![logstash_kibana_01](https://user-images.githubusercontent.com/55243431/72080021-c524bd00-32da-11ea-8d96-9b30a8ab4222.png)
+Aqui defino os arquivos de configuração do kibana.yml, onde tem a conexão com o elastic:
+* elasticsearch.hosts: [ "http://master:9200/" ]
+
+E os arquivos de configurações logstash.yml e o pipeline do paloalo.
+
+### 3.3. Redes e Volumes
 ![compose_02](https://user-images.githubusercontent.com/55243431/72041540-9b43aa00-328a-11ea-9d76-0434a9686fa2.png)
 
 Criando uma rede overlay para o cluster swarm, definindo o volume "elk_certs" como externo e os volumes "master" e "data" serão criados de acordo com o nome do serviço o número da réplica.
@@ -55,7 +62,7 @@ Agora basta fazer o deploy da stack que o cluster vai subir. :pray: :crossed_fin
 ```
 docker stack deploy -c docker-compose.yml elk
 ```
-### 4. Importar tamplate 
+### 4. Importar template 
 Vamos copiar e depois impontando index templates do PaloAlto no Elasticsearch.
 
 ``` 
@@ -75,9 +82,24 @@ Configuar o envio de syslog do firewall para o Logstash.
 ![paloalto_01](https://user-images.githubusercontent.com/55243431/72042338-02625e00-328d-11ea-8016-e0824633e2d1.png)
 
 ### 6. Kibana
-Agora vamos acessar o Kibana e configurar os index patterns e importar os dashboard.
+Agora vamos acessar o Kibana, mostrar o monitoring, configurar os index patterns e importar os dashboard.
 O usuário de acesso é elastic.
 ![kibana_01](https://user-images.githubusercontent.com/55243431/72042684-f4f9a380-328d-11ea-8237-51e6a10bfc83.png)
+
+Após logar vamos em monitoring na aba esquerda e veremos a saúde do nosso cluster. Essa opção nós habilitamos na configuração do elasticsearch.yml.
+* **xpack.monitoring.collection.enabled**
+
+![kibana_02](https://user-images.githubusercontent.com/55243431/72081442-3cf3e700-32dd-11ea-880d-ae07aa10d930.png)
+
+
+Temos 4 nodes, 2 master e 2 data.
+![kibana_03](https://user-images.githubusercontent.com/55243431/72081492-585ef200-32dd-11ea-9f80-4bc5a1021840.png)
+
+Após fazer o "scale" do serviço data o cluster é atualizado e passamos a ter 5 nodes, sendo 3 data.
+```
+docker service scale elk_data=3
+```
+![kibana_04](https://user-images.githubusercontent.com/55243431/72081642-9a883380-32dd-11ea-8def-d088728ae4ea.png)
 
 ### 6.1 Index patterns
 
