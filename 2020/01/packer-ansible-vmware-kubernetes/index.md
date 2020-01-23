@@ -64,6 +64,8 @@ $ ansible-playbook -i vms_deploy main.yml --ask-vault-pass -K
 ![ansible_kube_02](https://user-images.githubusercontent.com/55243431/72989823-c91e0800-3dcd-11ea-85c9-5a4aa33f709e.png)
 
 
+![ansible_kube_03](https://user-images.githubusercontent.com/55243431/72992301-4ba8c680-3dd2-11ea-8998-81c862b19889.png)
+
 
 
 
